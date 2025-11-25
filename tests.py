@@ -1,16 +1,14 @@
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file import write_file
+from functions.run_python_file import run_python_file
 def test():
-    test_cases = [
-        ["calculator", "lorem.txt", "wait, this isn't lorem ipsum"],
-        ["calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"],
-        ["calculator", "/tmp/temp.txt", "this should not be allowed"],
-    ]
-
-    for cases in test_cases:
-        wd, fl, cont = cases
-        print(write_file(wd, fl, cont))
+    print(run_python_file("calculator", "main.py"))
+    print(run_python_file("calculator", "main.py", ["3 + 5"]))
+    print(run_python_file("calculator", "tests.py"))
+    print(run_python_file("calculator", "../main.py"))
+    print(run_python_file("calculator", "nonexistent.py"))
+    print(run_python_file("calculator", "lorem.txt"))
 
 if __name__ == "__main__":
     test()
