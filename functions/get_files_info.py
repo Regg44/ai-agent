@@ -1,10 +1,6 @@
 import os
-# Temp variable for testing
-os.defpath = "../"
-wd = "calculator"
 def get_files_info(working_directory, directory="."):
-    # We use os.path.dir to base the working directory out of the root folder
-    # May need to change for testing.
+    # Obtain the absolute paths of needed files and directories
     full_directory = os.path.join(working_directory, directory)
     abs_wd_path = os.path.abspath(working_directory)
     abs_full_path = os.path.abspath(full_directory)

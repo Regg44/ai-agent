@@ -1,16 +1,16 @@
 from functions.get_files_info import get_files_info
+from functions.get_file_content import get_file_content
+from functions.write_file import write_file
+def test():
+    test_cases = [
+        ["calculator", "lorem.txt", "wait, this isn't lorem ipsum"],
+        ["calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"],
+        ["calculator", "/tmp/temp.txt", "this should not be allowed"],
+    ]
 
-test_cases = [
-    ["calculator", "."],
-    ["calculator", "pkg"],
-    ["calculator", "/bin"],
-    ["calculator", "../"]
-]
+    for cases in test_cases:
+        wd, fl, cont = cases
+        print(write_file(wd, fl, cont))
 
-for case in test_cases:
-    wd, d = case
-    if d == ".":
-        print("Result for current directory:")
-    else:
-        print(f"Result for '{d}' directory:")
-    get_files_info(wd, d)
+if __name__ == "__main__":
+    test()
