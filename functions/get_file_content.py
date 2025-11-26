@@ -12,6 +12,8 @@ def get_file_content(working_directory, file_path):
     if not os.path.isfile(abs_fl_path):
         return f'Error: File not found or is not a regular file: "{file_path}"'
     
+    # Use the constant in config.py for max characters
+    # Open the file as "read"
     with open(abs_fl_path, "r") as f:
         file_content_string = f.read(MAX_CHARS)
         if len(file_content_string) >= MAX_CHARS:

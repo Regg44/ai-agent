@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-
+from config import SYSTEM_PROMPT
 # Load local API key, you will need to input your own
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -22,7 +22,8 @@ messages = [
 ]
 client = genai.Client(api_key=api_key)
 response = client.models.generate_content(model="gemini-2.0-flash-001", 
-                                          contents=messages)
+                                          contents=messages,
+                                          config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT))
 
 # Print response, if the --verbose flag is set, print debugging information.
 print(response.text)
