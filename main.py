@@ -71,10 +71,11 @@ while True:
                 
     found = True
     for c in response.candidates:
-        for part in c.content.parts:
-            if part.function_call != None:
-                found = False
-                break
+        if c.content.parts != None:
+            for part in c.content.parts:
+                if part.function_call != None:
+                    found = False
+                    break
     if found and response.text != None:
         done = True
     if done:
@@ -83,7 +84,7 @@ while True:
     if tries >= 20:
         break
     
-
+print(messages)
 if "--verbose" in sys.argv[1:]:
     print(f"-> {call_obj.parts[0].function_response.response}")
     print("User prompt: ", prompt)
