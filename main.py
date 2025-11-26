@@ -5,6 +5,9 @@ from google import genai
 from google.genai import types
 from config import SYSTEM_PROMPT
 from functions.get_files_info import schema_get_files_info
+from functions.get_file_content import schema_get_file_content
+from functions.run_python_file import schema_run_python_file
+from functions.write_file import schema_write_file
 # Load local API key, you will need to input your own
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -26,7 +29,10 @@ client = genai.Client(api_key=api_key)
 # List of available functions, for now, only get_files_info
 available_functions = types.Tool(
     function_declarations=[
-        schema_get_files_info
+        schema_get_file_content,
+        schema_get_files_info,
+        schema_run_python_file,
+        schema_write_file
     ]
 )
 # Added the "tools" parameter to config containing the get_files_info schema.
@@ -37,7 +43,7 @@ response = client.models.generate_content(model="gemini-2.0-flash-001",
 if len(response.function_calls) > 0:
     for call in response.function_calls:
         print(f"Calling function: {call.name}({call.args})")
-        
+
 # Print response, if the --verbose flag is set, print debugging information.
 print(response.text)
 if "--verbose" in sys.argv[1:]:

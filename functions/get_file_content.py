@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 from config import MAX_CHARS
 def get_file_content(working_directory, file_path):
     abs_wd_path = os.path.abspath(working_directory)
@@ -19,3 +20,18 @@ def get_file_content(working_directory, file_path):
         if len(file_content_string) >= MAX_CHARS:
             file_content_string += f'[...File "{file_path}" truncated at 10000 characters]'
         return file_content_string
+    
+# Schema will allow the model to run this function
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Lists the files content constrained to the working directory. If the file has more than MAX_CHAR characters, it gets truncated",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The path of the file for which the contents are needed. Path is relative to the provided working directory",
+            ),
+        },
+    ),
+)
