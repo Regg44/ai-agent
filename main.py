@@ -36,23 +36,54 @@ available_functions = types.Tool(
         schema_write_file
     ]
 )
-# Added the "tools" parameter to config containing the get_files_info schema.
-response = client.models.generate_content(model="gemini-2.0-flash-001", 
-                                          contents=messages,
-                                          config=types.GenerateContentConfig(tools=[available_functions],system_instruction=SYSTEM_PROMPT))
-# Print out the function calls if any
-if response.function_calls != None:
-    for call in response.function_calls:
-        try:
-            call_obj = call_function(call, verbose=("--verbose" in sys.argv[1:]))
-            if call_obj.parts[0].function_response.response == None:
-                raise Exception("Something went really wrong")
 
-        except Exception as e:
-            print(e)
 
-# Print response, if the --verbose flag is set, print debugging information.
-print(response.text)
+tries = 0
+while True:
+    tries += 1
+    
+    done = False
+    # Added the "tools" parameter to config containing the get_files_info schema.
+    try:
+        response = client.models.generate_content(model="gemini-2.0-flash-001", 
+                                            contents=messages,
+                                            config=types.GenerateContentConfig(tools=[available_functions],system_instruction=SYSTEM_PROMPT))
+    except Exception as e:
+        print(e)
+    # Add candidates to messages list to create a feedback loop
+    if response.candidates != None:
+        for c in response.candidates:
+            messages.append(c.content)
+    # Print out the function calls if any
+    if response.function_calls != None:
+        responses = []
+        for call in response.function_calls:
+            try:
+                call_obj = call_function(call, verbose=("--verbose" in sys.argv[1:]))
+                if call_obj.parts[0].function_response.response == None:
+                    raise Exception("Something went really wrong")
+                responses.append(call_obj.parts[0])
+            except Exception as e:
+                print(e)
+        if len(responses) > 0:
+            function_response = types.Content(parts=responses, role="user")
+            messages.append(function_response)
+                
+    found = True
+    for c in response.candidates:
+        for part in c.content.parts:
+            if part.function_call != None:
+                found = False
+                break
+    if found and response.text != None:
+        done = True
+    if done:
+        print(response.text)
+        break
+    if tries >= 20:
+        break
+    
+
 if "--verbose" in sys.argv[1:]:
     print(f"-> {call_obj.parts[0].function_response.response}")
     print("User prompt: ", prompt)
