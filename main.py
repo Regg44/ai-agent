@@ -8,6 +8,7 @@ from functions.get_files_info import schema_get_files_info
 from functions.get_file_content import schema_get_file_content
 from functions.run_python_file import schema_run_python_file
 from functions.write_file import schema_write_file
+from functions.call_function import call_function
 # Load local API key, you will need to input your own
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -40,13 +41,20 @@ response = client.models.generate_content(model="gemini-2.0-flash-001",
                                           contents=messages,
                                           config=types.GenerateContentConfig(tools=[available_functions],system_instruction=SYSTEM_PROMPT))
 # Print out the function calls if any
-if len(response.function_calls) > 0:
+if response.function_calls != None:
     for call in response.function_calls:
-        print(f"Calling function: {call.name}({call.args})")
+        try:
+            call_obj = call_function(call, verbose=("--verbose" in sys.argv[1:]))
+            if call_obj.parts[0].function_response.response == None:
+                raise Exception("Something went really wrong")
+
+        except Exception as e:
+            print(e)
 
 # Print response, if the --verbose flag is set, print debugging information.
 print(response.text)
 if "--verbose" in sys.argv[1:]:
+    print(f"-> {call_obj.parts[0].function_response.response}")
     print("User prompt: ", prompt)
     print("Prompt tokens:",response.usage_metadata.prompt_token_count)
     print("Response tokens:",response.usage_metadata.candidates_token_count)

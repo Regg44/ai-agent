@@ -1,6 +1,9 @@
+import os
 # Maximum characters a file before it gets truncated
 MAX_CHARS = 10000 # Ten Thousand in this case.
 
+# Working directory in which we execute the code. This is a safety feature to ensure the model doesn't go rogue
+WORKING_DIR = "."
 # Hardcoded system prompt for the model.
 SYSTEM_PROMPT = system_prompt = """
 You are a helpful AI coding agent.
